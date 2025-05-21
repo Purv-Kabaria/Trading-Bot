@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Chart & Signal</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Trading Chart and Signal Analysis</h1>
+        <p>Current Server Time: {{ current_time }}</p>
+
+        <form method="POST" action="/">
+            <div>
+                <label for="idx_sel">Select Common Index (optional):</label>
+                <select id="idx_sel" name="common_indices_select">
+                    <option value="">-- Select an Index --</option>
+                    {% for name, exch in common_indices.items() %}
+                    <option value="{{ name }}_{{ exch }}" {% if symbol == name %}selected{% endif %}>{{ name }} ({{ exch }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="sym">Symbol:</label>
+                <input type="text" id="sym" name="symbol" value="{{ symbol | default('NIFTY') }}" required>
+            </div>
+            <div>
+                <label for="exch">Exchange:</label>
+                <input type="text" id="exch" name="exchange" value="{{ exchange | default('NSE') }}" required>
+            </div>
+            <div>
+                <label for="n_bars">Number of Candles (min 51 for SMA 50/RSI 14):</label>
+                <input type="number" id="n_bars" name="n_bars" value="{{ n_bars | default('5000') }}" min="51" required>
+            </div>
+            <input type="submit" value="Get Chart & Signal">
+        </form>
+
+        {% if error %}
+            <div class="info-section error">
+                <p>Error: {{ error }}</p>
+            </div>
+        {% endif %}
+
+        <div class="info-section">
+            <h2>Initial Data Load</h2>
+            {% if latest_bar %}
+                <div class="latest-bar-details">
+                    <p><strong>Latest Bar (from initial load):</strong></p>
+                    <span>Timestamp: {{ latest_bar.timestamp }}</span> |
+                    <span>Open: {{ latest_bar.open }}</span> |
+                    <span>High: {{ latest_bar.high }}</span> |
+                    <span>Low: {{ latest_bar.low }}</span> |
+                    <span>Close: {{ latest_bar.close }}</span> |
+                    <span>Volume: {{ latest_bar.volume }}</span>
+                    <br>
+                    <span>SMA Short: {{ latest_bar.sma_short | default('N/A') }}</span> |
+                    <span>SMA Long: {{ latest_bar.sma_long | default('N/A') }}</span> |
+                    <span>RSI: {{ latest_bar.rsi | default('N/A') }}</span>
+                </div>
+            {% else %}
+                <p>No latest bar data loaded initially.</p>
+            {% endif %}
+            {% if trading_signal %}
+                <p><strong>Initial Trading Signal:</strong> <span class="signal signal-{{ trading_signal }}">{{ trading_signal }}</span></p>
+            {% endif %}
+        </div>
+        
+        <div class="live-section">
+            <h3>Live Signal Update (every minute)</h3>
+            <p><strong>Current Signal: <span id="live-sig" class="signal">Fetching...</span></strong></p>
+            <p>Last Updated: <span id="live-ts">N/A</span></p>
+            <div id="live-bar" class="live-latest-bar-details">
+                <p><strong>Latest Bar (Live):</strong></p>
+                <span>Open: <span id="live-o">N/A</span></span> |
+                <span>High: <span id="live-h">N/A</span></span> |
+                <span>Low: <span id="live-l">N/A</span></span> |
+                <span>Close: <span id="live-c">N/A</span></span> |
+                    <span>Volume: <span id="live-v">N/A</span></span>
+                    <br>
+                    <span>SMA Short: <span id="live-sma-s">N/A</span></span> |
+                    <span>SMA Long: <span id="live-sma-l">N/A</span></span> |
+                    <span>RSI: <span id="live-rsi">N/A</span></span>
+                </div>
+                <p id="live-err" class="error"></p>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <button id="gemBtn" style="padding: 10px 20px; font-size: 1em; background-color: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">Get Gemini Analysis</button>
+            </div>
+            
+            <div id="gemModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" id="closeGemModal">&times;</span>
+                    <h2>Gemini Analysis</h2>
+                    
+                    <div id="gemLoad">
+                        <div class="loader"></div>
+                        <p class="loading-text">Requesting analysis from Gemini AI...</p>
+                    </div>
+                    
+                    <div id="gemAna" class="gemini-analysis">
+                        <p>Analysis generated at: <span id="gemAnaTime"></span></p>
+                        <textarea id="gemOut" readonly></textarea>
+                        <div class="modal-buttons">
+                            <button id="copyGemBtn" class="copy-btn">Copy to Clipboard</button>
+                            <button id="closeGemModal2" class="close-modal-btn">Close</button>
+                        </div>
+                    </div>
+                    
+                    <div id="gemErr" style="display: none;">
+                        <p class="error" id="gemErrTxt">An error occurred.</p>
+                        <div class="modal-buttons">
+                            <button id="closeGemErrBtn" class="close-modal-btn">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="chart">
+                {% if chart_json %}
+                <script type="text/javascript">
+                        if (typeof Plotly !== 'undefined') {
+                            var chartData = JSON.parse('{{ chart_json | safe }}');
+                            Plotly.newPlot('chart', chartData.data, chartData.layout);
+                        } else {
+                            console.error('Plotly.js not loaded.');
+                        }
+                </script>
+                {% else %}
+                <p>Submit the form to view the chart.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <script src="script.js"></script>
+    </body>
+    </html>

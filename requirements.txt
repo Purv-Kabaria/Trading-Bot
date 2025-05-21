@@ -1,0 +1,6 @@
+flask
+tvDatafeed
+plotly
+pandas
+python-dotenv
+google-generativeai 
