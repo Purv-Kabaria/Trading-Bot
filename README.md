@@ -5,22 +5,43 @@ A Flask web application that displays candlestick charts for financial indices w
 ## Features
 
 - Interactive candlestick charts for financial indices from various exchanges
-- Real-time technical analysis with:
-  - Short and long-term Simple Moving Averages (SMA)
+- Real-time technical analysis with multiple indicators:
+  - Simple Moving Averages (SMA)
   - Relative Strength Index (RSI)
-  - Automated trading signal generation (CALL/PUT/HOLD)
+  - Moving Average Convergence Divergence (MACD)
+  - Stochastic Oscillator
+  - Bollinger Bands
+- Customizable trading strategies with user-defined parameters
+- Automated trading signal generation (CALL/PUT/HOLD)
 - Live data updates from TradingView
 - Integration with Google Gemini AI for advanced market analysis
 - User-friendly interface with customizable parameters
 
-## Technical Indicators
+## Technical Indicators & Strategies
+
+The application uses several technical indicators that can be combined to create customized trading strategies:
 
 - **SMA (Simple Moving Average)**: Two SMAs (short-term 20-period and long-term 50-period) to identify trends
 - **RSI (Relative Strength Index)**: 14-period RSI to identify overbought or oversold conditions
-- **Trading Signals**:
-  - CALL: When short SMA > long SMA and RSI < 30 (potential buying opportunity)
-  - PUT: When short SMA < long SMA and RSI > 70 (potential selling opportunity)
-  - HOLD: When conditions don't meet CALL or PUT criteria
+- **MACD (Moving Average Convergence Divergence)**: 12/26/9 settings for trend and momentum analysis
+- **Stochastic Oscillator**: Identifies potential reversal points through overbought/oversold conditions
+- **Bollinger Bands**: Volatility-based indicator to identify potential price targets
+
+### Default NIFTY 50 Strategy
+
+The application includes an optimized default strategy for NIFTY 50 that combines MACD and RSI:
+
+- **CALL Signal**: Generated when MACD line crosses above the signal line with positive histogram AND RSI is below 40
+- **PUT Signal**: Generated when MACD line crosses below the signal line with negative histogram AND RSI is above 60
+- This strategy focuses on detecting momentum changes confirmed by RSI readings
+
+### Customizing Strategies
+
+Users can customize their trading strategies by:
+- Enabling/disabling specific indicators (SMA, MACD, Stochastic, Bollinger Bands)
+- Adjusting RSI and Stochastic overbought/oversold levels
+- Setting minimum signal confirmations required for CALL/PUT signals
+- Accessing the strategy customization panel via the "Customize Strategy" button
 
 ## Installation
 
@@ -55,8 +76,9 @@ A Flask web application that displays candlestick charts for financial indices w
 1. Select a common index from the dropdown or enter custom symbol and exchange
 2. Specify the number of candles to retrieve (minimum 51 recommended for technical indicators)
 3. Click "Get Chart & Signal" to view the candlestick chart and initial signal
-4. The application will automatically update the signal every minute
-5. Click "Get Gemini Analysis" for AI-powered market insights based on current data
+4. To customize your trading strategy, click the "Customize Strategy" button
+5. The application will automatically update the signal every minute
+6. Click "Get Gemini Analysis" for AI-powered market insights based on current data
 
 ## Common Index and Exchange Combinations
 
@@ -81,4 +103,5 @@ A Flask web application that displays candlestick charts for financial indices w
 
 - The application uses the tvDatafeed library to fetch historical data from TradingView
 - Data availability depends on market hours and TradingView's data policies
-- Gemini AI analysis requires a valid Google API key with access to Gemini services 
+- Gemini AI analysis requires a valid Google API key with access to Gemini services
+- The default trading strategy is not made by me, use at your own risk.

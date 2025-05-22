@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', (e) => {
     setupCurrentBarUpdates();
     setInterval(updateServerTime, 1000);
     setupGemModal();
+    setupStrategyModal();
+    setupIndicatorToggles();
+    initCharts();
 });
 
 function setupIdxHndlr() {
@@ -73,6 +76,15 @@ function updUIWithLvData(data) {
         document.getElementById('live-sma-s').textContent = data.latest_bar.sma_short ?? 'N/A';
         document.getElementById('live-sma-l').textContent = data.latest_bar.sma_long ?? 'N/A';
         document.getElementById('live-rsi').textContent = data.latest_bar.rsi ?? 'N/A';
+
+        document.getElementById('live-macd').textContent = data.latest_bar.macd ?? 'N/A';
+        document.getElementById('live-macd-signal').textContent = data.latest_bar.macd_signal ?? 'N/A';
+        document.getElementById('live-macd-hist').textContent = data.latest_bar.macd_hist ?? 'N/A';
+        document.getElementById('live-stoch-k').textContent = data.latest_bar.stoch_k ?? 'N/A';
+        document.getElementById('live-stoch-d').textContent = data.latest_bar.stoch_d ?? 'N/A';
+        document.getElementById('live-bb-upper').textContent = data.latest_bar.bb_upper ?? 'N/A';
+        document.getElementById('live-bb-middle').textContent = data.latest_bar.bb_middle ?? 'N/A';
+        document.getElementById('live-bb-lower').textContent = data.latest_bar.bb_lower ?? 'N/A';
     } else {
         document.getElementById('live-o').textContent = 'N/A';
         document.getElementById('live-h').textContent = 'N/A';
@@ -82,6 +94,15 @@ function updUIWithLvData(data) {
         document.getElementById('live-sma-s').textContent = 'N/A';
         document.getElementById('live-sma-l').textContent = 'N/A';
         document.getElementById('live-rsi').textContent = 'N/A';
+
+        document.getElementById('live-macd').textContent = 'N/A';
+        document.getElementById('live-macd-signal').textContent = 'N/A';
+        document.getElementById('live-macd-hist').textContent = 'N/A';
+        document.getElementById('live-stoch-k').textContent = 'N/A';
+        document.getElementById('live-stoch-d').textContent = 'N/A';
+        document.getElementById('live-bb-upper').textContent = 'N/A';
+        document.getElementById('live-bb-middle').textContent = 'N/A';
+        document.getElementById('live-bb-lower').textContent = 'N/A';
     }
 }
 
@@ -102,10 +123,6 @@ function setupGemModal() {
 
     setupModalClose(gModal, closeGemBtn, closeGemBtn2, closeGemErrBtn);
     setupCopy(cpyGemBtn, gemOut);
-    window.onclick = function (e) {
-        if (e.target == gModal)
-            gModal.style.display = "none";
-    }
 }
 
 function reqGemAna() {
@@ -156,9 +173,22 @@ function gthrDataForGemAna() {
     const lvRsi = document.getElementById('live-rsi') ? document.getElementById('live-rsi').textContent : 'N/A';
     const lvSig = document.getElementById('live-sig') ? document.getElementById('live-sig').textContent : 'N/A';
 
+    const lvMacd = document.getElementById('live-macd') ? document.getElementById('live-macd').textContent : 'N/A';
+    const lvMacdSig = document.getElementById('live-macd-signal') ? document.getElementById('live-macd-signal').textContent : 'N/A';
+    const lvStochK = document.getElementById('live-stoch-k') ? document.getElementById('live-stoch-k').textContent : 'N/A';
+    const lvStochD = document.getElementById('live-stoch-d') ? document.getElementById('live-stoch-d').textContent : 'N/A';
+    const lvBBUpper = document.getElementById('live-bb-upper') ? document.getElementById('live-bb-upper').textContent : 'N/A';
+    const lvBBMiddle = document.getElementById('live-bb-middle') ? document.getElementById('live-bb-middle').textContent : 'N/A';
+    const lvBBLower = document.getElementById('live-bb-lower') ? document.getElementById('live-bb-lower').textContent : 'N/A';
+
     const smaSPer = 20;
     const smaLPer = 50;
     const rsiPer = 14;
+    const macdFast = 12;
+    const macdSlow = 26;
+    const macdSignal = 9;
+    const stochK = 14;
+    const stochD = 3;
 
     return {
         timestamp: lvTs,
@@ -173,10 +203,22 @@ function gthrDataForGemAna() {
         sma_short: lvSmaS,
         sma_long: lvSmaL,
         rsi: lvRsi,
+        macd: lvMacd,
+        macd_signal: lvMacdSig,
+        stoch_k: lvStochK,
+        stoch_d: lvStochD,
+        bb_upper: lvBBUpper,
+        bb_middle: lvBBMiddle,
+        bb_lower: lvBBLower,
         signal: lvSig,
         sma_short_period: smaSPer,
         sma_long_period: smaLPer,
-        rsi_period: rsiPer
+        rsi_period: rsiPer,
+        macd_fast_period: macdFast,
+        macd_slow_period: macdSlow,
+        macd_signal_period: macdSignal,
+        stoch_k_period: stochK,
+        stoch_d_period: stochD
     };
 }
 
@@ -281,6 +323,15 @@ function updateCurrentBar() {
                 document.getElementById('current-sma-s').textContent = data.current_bar.sma_short ?? 'N/A';
                 document.getElementById('current-sma-l').textContent = data.current_bar.sma_long ?? 'N/A';
                 document.getElementById('current-rsi').textContent = data.current_bar.rsi ?? 'N/A';
+
+                document.getElementById('current-macd').textContent = data.current_bar.macd ?? 'N/A';
+                document.getElementById('current-macd-signal').textContent = data.current_bar.macd_signal ?? 'N/A';
+                document.getElementById('current-macd-hist').textContent = data.current_bar.macd_hist ?? 'N/A';
+                document.getElementById('current-stoch-k').textContent = data.current_bar.stoch_k ?? 'N/A';
+                document.getElementById('current-stoch-d').textContent = data.current_bar.stoch_d ?? 'N/A';
+                document.getElementById('current-bb-upper').textContent = data.current_bar.bb_upper ?? 'N/A';
+                document.getElementById('current-bb-middle').textContent = data.current_bar.bb_middle ?? 'N/A';
+                document.getElementById('current-bb-lower').textContent = data.current_bar.bb_lower ?? 'N/A';
             } else {
                 document.getElementById('current-o').textContent = 'N/A';
                 document.getElementById('current-h').textContent = 'N/A';
@@ -290,6 +341,15 @@ function updateCurrentBar() {
                 document.getElementById('current-sma-s').textContent = 'N/A';
                 document.getElementById('current-sma-l').textContent = 'N/A';
                 document.getElementById('current-rsi').textContent = 'N/A';
+
+                document.getElementById('current-macd').textContent = 'N/A';
+                document.getElementById('current-macd-signal').textContent = 'N/A';
+                document.getElementById('current-macd-hist').textContent = 'N/A';
+                document.getElementById('current-stoch-k').textContent = 'N/A';
+                document.getElementById('current-stoch-d').textContent = 'N/A';
+                document.getElementById('current-bb-upper').textContent = 'N/A';
+                document.getElementById('current-bb-middle').textContent = 'N/A';
+                document.getElementById('current-bb-lower').textContent = 'N/A';
             }
         })
         .catch(error => {
@@ -299,5 +359,241 @@ function updateCurrentBar() {
 
 function setupCurrentBarUpdates() {
     updateCurrentBar();
-    setInterval(updateCurrentBar, 2000);
+    setInterval(updateCurrentBar, 3000);
+}
+
+function setupIndicatorToggles() {
+    const toggleButtons = document.querySelectorAll('.indicator-toggle');
+
+    if (toggleButtons) {
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const targetChart = document.getElementById(targetId);
+
+                if (targetChart) {
+                    if (targetChart.style.display === 'none') {
+                        targetChart.style.display = 'block';
+                        this.classList.add('active');
+                    } else {
+                        targetChart.style.display = 'none';
+                        this.classList.remove('active');
+                    }
+                }
+            });
+        });
+    }
+}
+
+function initCharts() {
+    const chartContainer = document.getElementById('chart');
+    if (!chartContainer) return;
+
+    const chartDataElement = document.getElementById('chart-data');
+    if (!chartDataElement) return;
+
+    try {
+        if (typeof Plotly !== 'undefined') {
+            const chartData = JSON.parse(chartDataElement.textContent);
+            if (!chartData)
+                return;
+
+            Plotly.newPlot('chart', chartData.main.data, chartData.main.layout);
+            const indicators = document.createElement('div');
+            indicators.className = 'indicators-container';
+            document.getElementById('chart').appendChild(indicators);
+
+            const volumeDiv = document.createElement('div');
+            volumeDiv.id = 'volume-chart';
+            indicators.appendChild(volumeDiv);
+            Plotly.newPlot('volume-chart', chartData.volume.data, chartData.volume.layout);
+
+            const macdDiv = document.createElement('div');
+            macdDiv.id = 'macd-chart';
+            indicators.appendChild(macdDiv);
+            Plotly.newPlot('macd-chart', chartData.macd.data, chartData.macd.layout);
+
+            const rsiDiv = document.createElement('div');
+            rsiDiv.id = 'rsi-chart';
+            indicators.appendChild(rsiDiv);
+            Plotly.newPlot('rsi-chart', chartData.rsi.data, chartData.rsi.layout);
+
+            const stochDiv = document.createElement('div');
+            stochDiv.id = 'stoch-chart';
+            indicators.appendChild(stochDiv);
+            Plotly.newPlot('stoch-chart', chartData.stoch.data, chartData.stoch.layout);
+
+            const charts = [
+                document.getElementById('chart'),
+                document.getElementById('volume-chart'),
+                document.getElementById('macd-chart'),
+                document.getElementById('rsi-chart'),
+                document.getElementById('stoch-chart')
+            ];
+
+            charts.forEach(function (chart) {
+                chart.on('plotly_relayout', function (eventData) {
+                    const xaxis = eventData['xaxis.range[0]'] ?
+                        {
+                            'xaxis.range[0]': eventData['xaxis.range[0]'],
+                            'xaxis.range[1]': eventData['xaxis.range[1]']
+                        } : null;
+
+                    if (xaxis) {
+                        charts.forEach(function (otherChart) {
+                            if (otherChart !== chart) {
+                                Plotly.relayout(otherChart, xaxis);
+                            }
+                        });
+                    }
+                });
+            });
+        } else {
+            console.error('Plotly.js not loaded.');
+        }
+    } catch (error) {
+        console.error('Error initializing charts:', error);
+    }
+}
+
+function setupStrategyModal() {
+    const strategyModal = document.getElementById('strategyModal');
+    const strategyBtn = document.getElementById('strategyBtn');
+    const closeStrategyBtn = document.getElementById('closeStrategyModal');
+    const saveStrategyBtn = document.getElementById('saveStrategyBtn');
+    const resetStrategyBtn = document.getElementById('resetStrategyBtn');
+
+    if (strategyBtn) {
+        strategyBtn.addEventListener('click', function () {
+            loadCurrentStrategy();
+            strategyModal.style.display = 'block';
+        });
+    }
+
+    setupModalClose(strategyModal, closeStrategyBtn);
+
+    if (saveStrategyBtn) {
+        saveStrategyBtn.addEventListener('click', function () {
+            saveStrategy();
+        });
+    }
+
+    if (resetStrategyBtn) {
+        resetStrategyBtn.addEventListener('click', function () {
+            resetToDefaultStrategy();
+        });
+    }
+}
+
+window.addEventListener('click', function (e) {
+    const gemModal = document.getElementById('gemModal');
+    const strategyModal = document.getElementById('strategyModal');
+
+    if (e.target == gemModal) {
+        gemModal.style.display = 'none';
+    }
+
+    if (e.target == strategyModal) {
+        strategyModal.style.display = 'none';
+    }
+});
+
+function loadCurrentStrategy() {
+    document.getElementById('strategyForm').style.display = 'none';
+    document.getElementById('strategySaveSuccess').style.display = 'none';
+    document.getElementById('strategyError').style.display = 'none';
+
+    fetch('/get_strategy')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('strategyForm').style.display = 'block';
+
+            if (data.success && data.strategy_params) {
+                const params = data.strategy_params;
+
+                document.getElementById('sma_cross').checked = params.sma_cross;
+                document.getElementById('macd_signal').checked = params.macd_signal;
+                document.getElementById('stoch_signal').checked = params.stoch_signal;
+                document.getElementById('bb_strategy').checked = params.bb_strategy;
+
+                document.getElementById('rsi_oversold').value = params.rsi_oversold;
+                document.getElementById('rsi_overbought').value = params.rsi_overbought;
+                document.getElementById('stoch_oversold').value = params.stoch_oversold;
+                document.getElementById('stoch_overbought').value = params.stoch_overbought;
+                document.getElementById('min_signals_for_call').value = params.min_signals_for_call;
+                document.getElementById('min_signals_for_put').value = params.min_signals_for_put;
+            } else {
+                resetToDefaultStrategy();
+                if (data.error) {
+                    console.error('Error loading strategy:', data.error);
+                }
+            }
+        })
+        .catch(error => {
+            document.getElementById('strategyForm').style.display = 'block';
+            console.error('Error fetching strategy:', error);
+            resetToDefaultStrategy();
+        });
+}
+
+function saveStrategy() {
+    const strategyParams = {
+        sma_cross: document.getElementById('sma_cross').checked,
+        macd_signal: document.getElementById('macd_signal').checked,
+        stoch_signal: document.getElementById('stoch_signal').checked,
+        bb_strategy: document.getElementById('bb_strategy').checked,
+        rsi_oversold: parseInt(document.getElementById('rsi_oversold').value),
+        rsi_overbought: parseInt(document.getElementById('rsi_overbought').value),
+        stoch_oversold: parseInt(document.getElementById('stoch_oversold').value),
+        stoch_overbought: parseInt(document.getElementById('stoch_overbought').value),
+        min_signals_for_call: parseInt(document.getElementById('min_signals_for_call').value),
+        min_signals_for_put: parseInt(document.getElementById('min_signals_for_put').value)
+    };
+
+    document.getElementById('strategyForm').style.display = 'none';
+    document.getElementById('strategySaveSuccess').style.display = 'none';
+    document.getElementById('strategyError').style.display = 'none';
+
+    fetch('/update_strategy', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(strategyParams)
+    })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('strategyForm').style.display = 'block';
+
+            if (data.success) {
+                document.getElementById('strategySaveSuccess').style.display = 'block';
+
+                updLvSig();
+                updateCurrentBar();
+                setTimeout(() => {
+                    document.getElementById('strategySaveSuccess').style.display = 'none';
+                }, 3000);
+            } else {
+                document.getElementById('strategyError').style.display = 'block';
+                document.getElementById('strategyErrorTxt').textContent = data.error || 'An error occurred';
+            }
+        })
+        .catch(error => {
+            document.getElementById('strategyForm').style.display = 'block';
+            document.getElementById('strategyError').style.display = 'block';
+            document.getElementById('strategyErrorTxt').textContent = `Error: ${error.message}`;
+        });
+}
+
+function resetToDefaultStrategy() {
+    document.getElementById('sma_cross').checked = true;
+    document.getElementById('macd_signal').checked = true;
+    document.getElementById('stoch_signal').checked = true;
+    document.getElementById('bb_strategy').checked = false;
+    document.getElementById('rsi_oversold').value = 30;
+    document.getElementById('rsi_overbought').value = 70;
+    document.getElementById('stoch_oversold').value = 20;
+    document.getElementById('stoch_overbought').value = 80;
+    document.getElementById('min_signals_for_call').value = 2;
+    document.getElementById('min_signals_for_put').value = 2;
 }

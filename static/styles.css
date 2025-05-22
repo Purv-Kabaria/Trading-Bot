@@ -228,3 +228,170 @@ form input[type="submit"]:hover {
     border-radius: 3px;
     animation: highlight 2s ease-out;
 }
+
+.indicators-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    width: 100%;
+}
+
+#volume-chart, #macd-chart, #rsi-chart, #stoch-chart {
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.indicator-value {
+    display: inline-block;
+    padding: 2px 5px;
+    margin: 2px;
+    border-radius: 3px;
+    background-color: #f5f5f5;
+    font-family: monospace;
+}
+
+.indicator-section {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border-left: 3px solid #2196F3;
+}
+
+.indicator-section h4 {
+    margin-top: 0;
+    color: #2196F3;
+}
+
+.signal.signal-CALL {
+    background-color: green;
+    color: white;
+}
+
+.signal.signal-PUT {
+    background-color: red;
+    color: white;
+}
+
+.signal.signal-HOLD {
+    background-color: orange;
+    color: black;
+}
+
+.indicator-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.indicator-toggle {
+    padding: 5px 10px;
+    background-color: #e9e9e9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+}
+
+.indicator-toggle.active {
+    background-color: #2196F3;
+    color: white;
+    border-color: #0b7dda;
+}
+
+@media (max-width: 768px) {
+    .indicators-container {
+        margin-top: 10px;
+    }
+    
+    #volume-chart, #macd-chart, #rsi-chart, #stoch-chart {
+        margin-bottom: 5px;
+    }
+}
+
+#strategyModal .modal-content {
+    max-width: 600px;
+}
+
+.strategy-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.strategy-checkbox {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.strategy-checkbox input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.param-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.param-group label {
+    width: 180px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.param-group input[type="number"] {
+    width: 70px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.submit-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#saveStrategyBtn, #resetStrategyBtn {
+    padding: 8px 16px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#saveStrategyBtn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#resetStrategyBtn {
+    background-color: #f44336;
+    color: white;
+}
+
+.success-message {
+    color: #4CAF50;
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 0;
+}
+
+#strategyBtn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}

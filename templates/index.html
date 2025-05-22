@@ -35,6 +35,7 @@
                 <input type="number" id="n_bars" name="n_bars" value="{{ n_bars | default('5000') }}" min="51" required>
             </div>
             <input type="submit" value="Get Chart & Signal">
+            <button id="strategyBtn" type="button">Customize Strategy</button>
         </form>
 
         {% if error %}
@@ -77,83 +78,187 @@
                 <span>High: <span id="live-h">N/A</span></span> |
                 <span>Low: <span id="live-l">N/A</span></span> |
                 <span>Close: <span id="live-c">N/A</span></span> |
-                    <span>Volume: <span id="live-v">N/A</span></span>
+                <span>Volume: <span id="live-v">N/A</span></span>
+                <br>
+                <div class="indicator-section">
+                    <h4>Technical Indicators:</h4>
+                    <span class="indicator-value">SMA Short: <span id="live-sma-s">N/A</span></span>
+                    <span class="indicator-value">SMA Long: <span id="live-sma-l">N/A</span></span>
+                    <span class="indicator-value">RSI: <span id="live-rsi">N/A</span></span>
                     <br>
-                    <span>SMA Short: <span id="live-sma-s">N/A</span></span> |
-                    <span>SMA Long: <span id="live-sma-l">N/A</span></span> |
-                    <span>RSI: <span id="live-rsi">N/A</span></span>
-                </div>
-                <p id="live-err" class="error"></p>
-            </div>
-            
-            <div class="current-bar-section">
-                <h3>Current Forming Candle (real-time)</h3>
-                <p>Last Updated: <span id="realtime-ts">N/A</span></p>
-                <p><strong>Real-time Signal: <span id="current-sig" class="signal">Fetching...</span></strong></p>
-                <div id="current-bar" class="current-bar-details">
-                    <p><strong>Current Forming Bar:</strong></p>
-                    <span>Open: <span id="current-o">N/A</span></span> |
-                    <span>High: <span id="current-h">N/A</span></span> |
-                    <span>Low: <span id="current-l">N/A</span></span> |
-                    <span>Close: <span id="current-c">N/A</span></span> |
-                    <span>Volume: <span id="current-v">N/A</span></span>
+                    <span class="indicator-value">MACD: <span id="live-macd">N/A</span></span>
+                    <span class="indicator-value">MACD Signal: <span id="live-macd-signal">N/A</span></span>
+                    <span class="indicator-value">MACD Hist: <span id="live-macd-hist">N/A</span></span>
                     <br>
-                    <span>SMA Short: <span id="current-sma-s">N/A</span></span> |
-                    <span>SMA Long: <span id="current-sma-l">N/A</span></span> |
-                    <span>RSI: <span id="current-rsi">N/A</span></span>
-                </div>
-                <p id="current-err" class="error"></p>
-            </div>
-            
-            <div style="margin-top: 20px; text-align: center;">
-                <button id="gemBtn" style="padding: 10px 20px; font-size: 1em; background-color: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">Get Gemini Analysis</button>
-            </div>
-            
-            <div id="gemModal" class="modal">
-                <div class="modal-content">
-                    <span class="close-button" id="closeGemModal">&times;</span>
-                    <h2>Gemini Analysis</h2>
-                    
-                    <div id="gemLoad">
-                        <div class="loader"></div>
-                        <p class="loading-text">Requesting analysis from Gemini AI...</p>
-                    </div>
-                    
-                    <div id="gemAna" class="gemini-analysis">
-                        <p>Analysis generated at: <span id="gemAnaTime"></span></p>
-                        <textarea id="gemOut" readonly></textarea>
-                        <div class="modal-buttons">
-                            <button id="copyGemBtn" class="copy-btn">Copy to Clipboard</button>
-                            <button id="closeGemModal2" class="close-modal-btn">Close</button>
-                        </div>
-                    </div>
-                    
-                    <div id="gemErr" style="display: none;">
-                        <p class="error" id="gemErrTxt">An error occurred.</p>
-                        <div class="modal-buttons">
-                            <button id="closeGemErrBtn" class="close-modal-btn">Close</button>
-                        </div>
-                    </div>
+                    <span class="indicator-value">Stoch %K: <span id="live-stoch-k">N/A</span></span>
+                    <span class="indicator-value">Stoch %D: <span id="live-stoch-d">N/A</span></span>
+                    <br>
+                    <span class="indicator-value">BB Upper: <span id="live-bb-upper">N/A</span></span>
+                    <span class="indicator-value">BB Middle: <span id="live-bb-middle">N/A</span></span>
+                    <span class="indicator-value">BB Lower: <span id="live-bb-lower">N/A</span></span>
                 </div>
             </div>
-            
-            <div id="chart">
-                {% if chart_json %}
-                <script type="text/javascript">
-                        if (typeof Plotly !== 'undefined') {
-                            var chartData = JSON.parse('{{ chart_json | safe }}');
-                            Plotly.newPlot('chart', chartData.data, chartData.layout);
-                        } else {
-                            console.error('Plotly.js not loaded.');
-                        }
-                </script>
-                {% else %}
-                <p>Submit the form to view the chart.</p>
-                {% endif %}
+            <p id="live-err" class="error"></p>
+        </div>
+        
+        <div class="current-bar-section">
+            <h3>Current Forming Candle (real-time)</h3>
+            <p>Last Updated: <span id="realtime-ts">N/A</span></p>
+            <p><strong>Real-time Signal: <span id="current-sig" class="signal">Fetching...</span></strong></p>
+            <div id="current-bar" class="current-bar-details">
+                <p><strong>Current Forming Bar:</strong></p>
+                <span>Open: <span id="current-o">N/A</span></span> |
+                <span>High: <span id="current-h">N/A</span></span> |
+                <span>Low: <span id="current-l">N/A</span></span> |
+                <span>Close: <span id="current-c">N/A</span></span> |
+                <span>Volume: <span id="current-v">N/A</span></span>
+                <br>
+                <div class="indicator-section">
+                    <h4>Technical Indicators:</h4>
+                    <span class="indicator-value">SMA Short: <span id="current-sma-s">N/A</span></span>
+                    <span class="indicator-value">SMA Long: <span id="current-sma-l">N/A</span></span>
+                    <span class="indicator-value">RSI: <span id="current-rsi">N/A</span></span>
+                    <br>
+                    <span class="indicator-value">MACD: <span id="current-macd">N/A</span></span>
+                    <span class="indicator-value">MACD Signal: <span id="current-macd-signal">N/A</span></span>
+                    <span class="indicator-value">MACD Hist: <span id="current-macd-hist">N/A</span></span>
+                    <br>
+                    <span class="indicator-value">Stoch %K: <span id="current-stoch-k">N/A</span></span>
+                    <span class="indicator-value">Stoch %D: <span id="current-stoch-d">N/A</span></span>
+                    <br>
+                    <span class="indicator-value">BB Upper: <span id="current-bb-upper">N/A</span></span>
+                    <span class="indicator-value">BB Middle: <span id="current-bb-middle">N/A</span></span>
+                    <span class="indicator-value">BB Lower: <span id="current-bb-lower">N/A</span></span>
+                </div>
+            </div>
+            <p id="current-err" class="error"></p>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <button id="gemBtn" style="padding: 10px 20px; font-size: 1em; background-color: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">Get Gemini Analysis</button>
+        </div>
+        
+        <div id="gemModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" id="closeGemModal">&times;</span>
+                <h2>Gemini Analysis</h2>
+                
+                <div id="gemLoad">
+                    <div class="loader"></div>
+                    <p class="loading-text">Requesting analysis from Gemini AI...</p>
+                </div>
+                
+                <div id="gemAna" class="gemini-analysis">
+                    <p>Analysis generated at: <span id="gemAnaTime"></span></p>
+                    <textarea id="gemOut" readonly></textarea>
+                    <div class="modal-buttons">
+                        <button id="copyGemBtn" class="copy-btn">Copy to Clipboard</button>
+                        <button id="closeGemModal2" class="close-modal-btn">Close</button>
+                    </div>
+                </div>
+                
+                <div id="gemErr" style="display: none;">
+                    <p class="error" id="gemErrTxt">An error occurred.</p>
+                    <div class="modal-buttons">
+                        <button id="closeGemErrBtn" class="close-modal-btn">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <script src="/static/script.js"></script>
+        <div id="strategyModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" id="closeStrategyModal">&times;</span>
+                <h2>Customize Trading Strategy</h2>
+                
+                <div id="strategyForm">
+                    <h3>Select Active Strategies</h3>
+                    <div class="strategy-section">
+                        <div class="strategy-checkbox">
+                            <input type="checkbox" id="sma_cross" name="sma_cross" checked>
+                            <label for="sma_cross">SMA Crossover with RSI</label>
+                        </div>
+                        <div class="strategy-checkbox">
+                            <input type="checkbox" id="macd_signal" name="macd_signal" checked>
+                            <label for="macd_signal">MACD Signal Line Crossover</label>
+                        </div>
+                        <div class="strategy-checkbox">
+                            <input type="checkbox" id="stoch_signal" name="stoch_signal" checked>
+                            <label for="stoch_signal">Stochastic Oscillator</label>
+                        </div>
+                        <div class="strategy-checkbox">
+                            <input type="checkbox" id="bb_strategy" name="bb_strategy">
+                            <label for="bb_strategy">Bollinger Bands</label>
+                        </div>
+                    </div>
+                    
+                    <h3>Strategy Parameters</h3>
+                    <div class="strategy-section">
+                        <h4>RSI Parameters</h4>
+                        <div class="param-group">
+                            <label for="rsi_oversold">Oversold Level:</label>
+                            <input type="number" id="rsi_oversold" name="rsi_oversold" value="30" min="1" max="99">
+                        </div>
+                        <div class="param-group">
+                            <label for="rsi_overbought">Overbought Level:</label>
+                            <input type="number" id="rsi_overbought" name="rsi_overbought" value="70" min="1" max="99">
+                        </div>
+                        
+                        <h4>Stochastic Parameters</h4>
+                        <div class="param-group">
+                            <label for="stoch_oversold">Oversold Level:</label>
+                            <input type="number" id="stoch_oversold" name="stoch_oversold" value="20" min="1" max="99">
+                        </div>
+                        <div class="param-group">
+                            <label for="stoch_overbought">Overbought Level:</label>
+                            <input type="number" id="stoch_overbought" name="stoch_overbought" value="80" min="1" max="99">
+                        </div>
+                        
+                        <h4>Signal Confirmation</h4>
+                        <div class="param-group">
+                            <label for="min_signals_for_call">Minimum Strategies for CALL Signal:</label>
+                            <input type="number" id="min_signals_for_call" name="min_signals_for_call" value="2" min="1" max="4">
+                        </div>
+                        <div class="param-group">
+                            <label for="min_signals_for_put">Minimum Strategies for PUT Signal:</label>
+                            <input type="number" id="min_signals_for_put" name="min_signals_for_put" value="2" min="1" max="4">
+                        </div>
+                    </div>
+                    
+                    <div class="submit-container">
+                        <button id="saveStrategyBtn" type="button">Save Strategy</button>
+                        <button id="resetStrategyBtn" type="button">Reset to Default</button>
+                    </div>
+                </div>
+                
+                <div id="strategySaveSuccess" style="display: none;">
+                    <p class="success-message">Strategy updated successfully!</p>
+                </div>
+                
+                <div id="strategyError" style="display: none;">
+                    <p class="error" id="strategyErrorTxt">An error occurred.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="chart">
+            {% if chart_json %}
+            <div class="indicator-toggles">
+                <button class="indicator-toggle active" data-target="volume-chart">Volume</button>
+                <button class="indicator-toggle active" data-target="macd-chart">MACD</button>
+                <button class="indicator-toggle active" data-target="rsi-chart">RSI</button>
+                <button class="indicator-toggle active" data-target="stoch-chart">Stochastic</button>
+            </div>
+            
+            <script type="application/json" id="chart-data">
+                {{ chart_json | safe }}
+            </script>
+            {% else %}
+            <p>Submit the form to view the chart.</p>
+            {% endif %}
+        </div>
     </div>
+    
+    <script src="/static/script.js"></script>
 </body>
 </html>
