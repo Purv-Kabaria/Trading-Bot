@@ -209,6 +209,70 @@ def get_signal():
         'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     })
 
+@app.route('/get_current_bar', methods=['GET'])
+def get_current_bar():
+    sym = request.args.get('symbol', 'NIFTY').strip()
+    exch = request.args.get('exchange', 'NSE').strip()
+    
+    try:
+        data = tv.get_hist(symbol=sym, exchange=exch, interval=Interval.in_1_minute, n_bars=60)
+        if data is None or data.empty:
+            return jsonify({
+                'error_message': f"No data for {sym} on {exch}.",
+                'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            })
+        
+        now = datetime.datetime.now()
+        current_minute_start = now.replace(second=0, microsecond=0)
+        last_bar = data.iloc[-1]
+        
+        sma_short_period = 20
+        sma_long_period = 50
+        rsi_period = 14
+        
+        data['SMA_short'] = calc_sma(data['close'], sma_short_period)
+        data['SMA_long'] = calc_sma(data['close'], sma_long_period)
+        data['RSI'] = calc_rsi(data['close'], rsi_period)
+        
+        s_short = data['SMA_short'].iloc[-1]
+        s_long = data['SMA_long'].iloc[-1]
+        rsi = data['RSI'].iloc[-1]
+        
+        current_signal = "Signal pending..."
+        if pd.isna(s_short) or pd.isna(s_long) or pd.isna(rsi):
+            current_signal = "Indicator calc error"
+        else:
+            if s_short > s_long and rsi < 30:
+                current_signal = "CALL"
+            elif s_short < s_long and rsi > 70:
+                current_signal = "PUT"
+            else:
+                current_signal = "HOLD"
+        
+        current_bar = {
+            'timestamp': current_minute_start.strftime('%Y-%m-%d %H:%M:%S'),
+            'open': round(last_bar['open'], 2),
+            'high': round(last_bar['high'], 2),
+            'low': round(last_bar['low'], 2),
+            'close': round(last_bar['close'], 2),
+            'volume': int(last_bar.get('volume', 0)) if 'volume' in last_bar and pd.notna(last_bar['volume']) else 'N/A',
+            'sma_short': round(s_short, 2) if pd.notna(s_short) else 'N/A',
+            'sma_long': round(s_long, 2) if pd.notna(s_long) else 'N/A',
+            'rsi': round(rsi, 2) if pd.notna(rsi) else 'N/A'
+        }
+        
+        return jsonify({
+            'current_bar': current_bar,
+            'trading_signal': current_signal,
+            'timestamp': now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error_message': f"Error: {str(e)}",
+            'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        })
+
 @app.route('/query_gemini', methods=['POST'])
 def query_gemini():
     try:

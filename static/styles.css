@@ -185,3 +185,46 @@ form input[type="submit"]:hover {
 .gemini-analysis {
   display: none;
 }
+
+.current-bar-section {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f0f8ff;
+    border-radius: 5px;
+    border-left: 5px solid #007bff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.current-bar-section h3 {
+    color: #0056b3;
+    margin-top: 0;
+}
+
+.current-bar-details {
+    margin: 10px 0;
+    font-family: monospace;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.current-bar-details p {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#realtime-ts {
+    font-family: monospace;
+    color: #666;
+}
+
+@keyframes highlight {
+    0% { background-color: transparent; }
+    30% { background-color: rgba(0, 123, 255, 0.2); }
+    100% { background-color: transparent; }
+}
+
+.current-bar-details span span {
+    padding: 2px 4px;
+    border-radius: 3px;
+    animation: highlight 2s ease-out;
+}

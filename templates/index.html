@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trading Chart & Signal</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div class="container">
@@ -86,6 +86,25 @@
                 <p id="live-err" class="error"></p>
             </div>
             
+            <div class="current-bar-section">
+                <h3>Current Forming Candle (real-time)</h3>
+                <p>Last Updated: <span id="realtime-ts">N/A</span></p>
+                <p><strong>Real-time Signal: <span id="current-sig" class="signal">Fetching...</span></strong></p>
+                <div id="current-bar" class="current-bar-details">
+                    <p><strong>Current Forming Bar:</strong></p>
+                    <span>Open: <span id="current-o">N/A</span></span> |
+                    <span>High: <span id="current-h">N/A</span></span> |
+                    <span>Low: <span id="current-l">N/A</span></span> |
+                    <span>Close: <span id="current-c">N/A</span></span> |
+                    <span>Volume: <span id="current-v">N/A</span></span>
+                    <br>
+                    <span>SMA Short: <span id="current-sma-s">N/A</span></span> |
+                    <span>SMA Long: <span id="current-sma-l">N/A</span></span> |
+                    <span>RSI: <span id="current-rsi">N/A</span></span>
+                </div>
+                <p id="current-err" class="error"></p>
+            </div>
+            
             <div style="margin-top: 20px; text-align: center;">
                 <button id="gemBtn" style="padding: 10px 20px; font-size: 1em; background-color: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">Get Gemini Analysis</button>
             </div>
@@ -134,6 +153,7 @@
             </div>
         </div>
         
-        <script src="script.js"></script>
-    </body>
-    </html>
+        <script src="/static/script.js"></script>
+    </div>
+</body>
+</html>

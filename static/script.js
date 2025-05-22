@@ -3,7 +3,9 @@ document.addEventListener('DOMContentLoaded', (e) => {
     if (chkInitialFtch())
         updLvSig();
 
-    setInterval(updLvSig, 60000);
+    setupMinuteBasedUpdates();
+    setupCurrentBarUpdates();
+    setInterval(updateServerTime, 1000);
     setupGemModal();
 });
 
@@ -197,4 +199,105 @@ function setupCopy(cpyBtn, txtEl) {
             alert('Analysis copied!');
         });
     }
+}
+
+function updateServerTime() {
+    const serverTimeElement = document.querySelector('.container > p:first-of-type');
+    if (serverTimeElement) {
+        const now = new Date();
+        const options = {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            fractionalSecondDigits: 3
+        };
+
+        const formatter = new Intl.DateTimeFormat('en-IN', options);
+        const parts = formatter.formatToParts(now);
+
+        let formattedDate = '';
+        const partValues = {};
+
+        parts.forEach(part => {
+            partValues[part.type] = part.value;
+        });
+
+        formattedDate = `${partValues.year}-${partValues.month}-${partValues.day} ${partValues.hour}:${partValues.minute}:${partValues.second}.${partValues.fractionalSecond || '000'}`;
+
+        serverTimeElement.textContent = `Current Server Time (IST): ${formattedDate}`;
+    }
+}
+
+function setupMinuteBasedUpdates() {
+    updLvSig();
+    const now = new Date();
+    const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
+    setTimeout(() => {
+        updLvSig();
+        setInterval(updLvSig, 60000);
+    }, msUntilNextMinute + 1000);
+}
+
+function updateCurrentBar() {
+    const symIn = document.getElementById('sym');
+    const exchIn = document.getElementById('exch');
+
+    let curSym = symIn && symIn.value ? symIn.value : 'NIFTY';
+    let curExch = exchIn && exchIn.value ? exchIn.value : 'NSE';
+
+    fetch(`/get_current_bar?symbol=${encodeURIComponent(curSym)}&exchange=${encodeURIComponent(curExch)}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('realtime-ts').textContent = data.timestamp || 'N/A';
+
+            const curSigEl = document.getElementById('current-sig');
+            if (curSigEl) {
+                curSigEl.textContent = data.trading_signal || 'Unknown';
+                curSigEl.className = 'signal';
+                if (data.trading_signal) {
+                    curSigEl.classList.add(`signal-${data.trading_signal}`);
+                }
+            }
+
+            const curErrEl = document.getElementById('current-err');
+            if (data.error_message) {
+                curErrEl.textContent = data.error_message;
+            } else {
+                curErrEl.textContent = '';
+            }
+
+            if (data.current_bar) {
+                document.getElementById('current-o').textContent = data.current_bar.open ?? 'N/A';
+                document.getElementById('current-h').textContent = data.current_bar.high ?? 'N/A';
+                document.getElementById('current-l').textContent = data.current_bar.low ?? 'N/A';
+                document.getElementById('current-c').textContent = data.current_bar.close ?? 'N/A';
+                document.getElementById('current-v').textContent = data.current_bar.volume ?? 'N/A';
+                document.getElementById('current-sma-s').textContent = data.current_bar.sma_short ?? 'N/A';
+                document.getElementById('current-sma-l').textContent = data.current_bar.sma_long ?? 'N/A';
+                document.getElementById('current-rsi').textContent = data.current_bar.rsi ?? 'N/A';
+            } else {
+                document.getElementById('current-o').textContent = 'N/A';
+                document.getElementById('current-h').textContent = 'N/A';
+                document.getElementById('current-l').textContent = 'N/A';
+                document.getElementById('current-c').textContent = 'N/A';
+                document.getElementById('current-v').textContent = 'N/A';
+                document.getElementById('current-sma-s').textContent = 'N/A';
+                document.getElementById('current-sma-l').textContent = 'N/A';
+                document.getElementById('current-rsi').textContent = 'N/A';
+            }
+        })
+        .catch(error => {
+            document.getElementById('current-err').textContent = `Error: ${error.message}`;
+        });
+}
+
+function setupCurrentBarUpdates() {
+    updateCurrentBar();
+    setInterval(updateCurrentBar, 2000);
 }
